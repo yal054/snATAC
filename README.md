@@ -9,7 +9,7 @@ download dataset: CEMBA171212_4B
 #### 1. run NMF on tf-idf normlization sparse matrix, plot normalized matrix H & W
 
 sklearn.nmf.py
-`
+```bash
 python sklearn.nmf.py -h
 usage: sklearn.nmf.py [-h] [-i INPUTF] [-x XGI] [-y YGI] [-r RANK] [-n N_RUN]
                       [-p PROB] [-c CT] [-o OUTPREFIX]
@@ -29,10 +29,10 @@ optional arguments:
   -c CT, --ct CT        an integer for # of read counts used for filtering
   -o OUTPREFIX, --outPrefix OUTPREFIX
                         output prefix
-`
+```
 
 sklearn.plotH.R
-`
+```bash
 Rscript sklearn.plotH.R -h
 usage: sklearn.plotH.R [-h] -i INPUT -o OUTPUT
 
@@ -42,13 +42,13 @@ optional arguments:
                         input matrix
   -o OUTPUT, --output OUTPUT
                         output file prefix
-`
+```
 
 example:
-`
+```bash
 python sklearn.nmf.py -i tmp.repl1_CEMBA171212_4B.sparse.npz -x tmp.repl1_CEMBA171212_4B.xgi -y tmp.repl1_CEMBA171212_4B.ygi -o example -r 6 -n 30 -p 0.05 -c 1000 > example.log
 
-`
+```
 
 #### 2. sklearn.nmf.stat.py
 #### 3. sklearn.nmf.plot.py
