@@ -85,6 +85,19 @@ optional arguments:
                         output prefix
 ```
 
+calculate cell sparseness and entropy using the statH file
+```bash
+Rscript sklearn.statBox.R -h
+usage: sklearn.statBox.R [-h] -i INPUT -o OUTPUT
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        input statH
+  -o OUTPUT, --output OUTPUT
+                        output file prefix
+```
+
 example:
 ```
 python sklearn.nmf.stat.py -m example.npz \
@@ -93,6 +106,10 @@ python sklearn.nmf.stat.py -m example.npz \
 			--basis example.W.mx -\
 			-coef example.H.mx \
 			-c 0.2 -o example
+
+# calculate cell sparseness and entropy using the statH file
+Rscript sklearn.statBox.R -i example.statH \
+			-o example >> example.sta.txt
 ```
 
 #### 3. calculate silhouette and plot tSNE using coefficient matrix H
