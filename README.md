@@ -54,7 +54,7 @@ python sklearn.nmf.py -i tmp.repl1_CEMBA171212_4B.sparse.npz \
 			-x tmp.repl1_CEMBA171212_4B.xgi \
 			-y tmp.repl1_CEMBA171212_4B.ygi 
 			-o example \
-			-r 6 -n 30 -p 0.05 -c 1000 > example.log
+			-r 15 -n 30 -p 0.05 -c 1000 > example.log
 
 # draw heatmap
 Rscript sklearn.plotH.R -i example.H.mx -o example.H
@@ -136,7 +136,7 @@ example:
 ```bash
 python sklearn.nmf.plot.py --normH example.normH \
 			--statH example.statH \
-			-p 0.2 -o example
+			-p 30 -o example
 ```
 
 
