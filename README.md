@@ -52,7 +52,7 @@ example:
 # run NMF
 python sklearn.nmf.py -i tmp.repl1_CEMBA171212_4B.sparse.npz \
 			-x tmp.repl1_CEMBA171212_4B.xgi \
-			-y tmp.repl1_CEMBA171212_4B.ygi 
+			-y tmp.repl1_CEMBA171212_4B.ygi \
 			-o example \
 			-r 15 -n 30 -p 0.05 -c 1000 > example.log
 
@@ -104,7 +104,7 @@ python sklearn.nmf.stat.py -m example.npz \
 			-x example.xgi \
 			-y example.ygi \
 			--basis example.W.mx -\
-			-coef example.H.mx \
+			--coef example.H.mx \
 			-c 0.2 -o example
 
 # calculate cell sparseness and entropy using the statH file
