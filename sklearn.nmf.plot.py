@@ -124,7 +124,7 @@ def plot_silhouette_tsne(o_silhouette, X_transformed, o_stat_H, rank, prefix):
 			0, ith_cluster_silhouette_values,
 			facecolor=color, edgecolor=color, alpha=0.7)
 		"""# Label the silhouette plots with their cluster numbers at the middle"""
-		ax1.text(-0.05, y_lower + 0.5 * size_cluster_i, str(i))
+		ax1.text(-0.05, y_lower + 0.5 * size_cluster_i, str(i+1))
 		"""# Compute the new y_lower for next plot"""
 		y_lower = y_upper + 10  # 10 for the 0 samples
 
