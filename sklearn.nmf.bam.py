@@ -1,6 +1,7 @@
 #!/bin/python
 
 import argparse
+from multiprocessing import Pool
 
 parser = argparse.ArgumentParser(description='filter bam based on QNAMES')
 parser.add_argument('--bam', type=str, dest="bam", help='bam file')
@@ -21,26 +22,35 @@ def run():
 	statHf = args.statH
 	outPrefix = args.outPrefix
 	print("filter out bam files")
-	generate_bam(bamf, statHf, outPrefix)
+	generate_bams(bamf, statHf, outPrefix)
 	end_time = pc()
 	print('Used (secs): ', end_time - start_time)
 
-def generate_bam(bamf, statHf, prefix):
+def generate_bams(bamf, statHf, prefix):
 	o_stat_H = np.genfromtxt(statHf, dtype=None, names=True)
 	rank = np.max(o_stat_H['class0']).astype(int) + 1
-	for r in range(rank):
-		bamF = pysam.AlignmentFile(bamf)
-		qnames = list(o_stat_H[np.where(o_stat_H['class0']==r)]['xgi'].astype(str))
-		qnames_set = set(qnames)
-		n = r + 1
-		bam_fname = prefix + "." + "metacell_" + str(n) + "." + "bam"
-		print("For metaCell =", n, "The filtered bam is writing to:", bam_fname)
-		obam = pysam.AlignmentFile(bam_fname, "wb", template=bamF)
-		for b in bamF.fetch(until_eof=True):
-			if b.query_name.split(':')[0] in qnames_set:
-				obam.write(b)
-		obam.close()
-		bamF.close()
+	p = Pool(rank)
+	for idx in range(rank):
+		p.apply_async(generate_bam_worker, (bamf, o_stat_H, idx, prefix))
+	p.close()
+	p.join()
+
+def generate_bam_worker(bamf, o_stat_H, r, prefix):
+	bamF = pysam.AlignmentFile(bamf)
+	qnames = list(o_stat_H[np.where(o_stat_H['class0']==r)]['xgi'].astype(str))
+	qnames_set = set(qnames)
+	n = r + 1
+	bam_fname = prefix + "." + "metacell_" + str(n) + "." + "bam"
+	print("For metaCell =", n, "The filtered bam is writing to:", bam_fname)
+	obam = pysam.AlignmentFile(bam_fname, "wb", template=bamF)
+	for b in bamF.fetch(until_eof=True):
+		if b.query_name.split(':')[0] in qnames_set:
+			obam.write(b)
+	obam.close()
+	bamF.close()
+  print("metaCell =", n, " witting finished.")
+
+ 
 
 if __name__ == "__main__":
 	"""filter bam based on QNAMES"""
