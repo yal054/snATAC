@@ -60,7 +60,6 @@ def run():
 	ygi = read_xgi(ygi) 
 	out = filter_V(V, xgi, ygi, prob, ct)
 	V = out['V']
-	write_coo(V, outPrefix)
 	selt_xgi = out['xgi']
 	np.savetxt('.'.join([outPrefix, "xgi"]), selt_xgi, fmt= "%s", delimiter="\t") 
 	selt_ygi = out['ygi']
@@ -313,16 +312,20 @@ def run_nmf(V, rank, n, prefix):
 		W = model.fit_transform(V)
 		H = model.components_
 		print("1/%d : reconstruction err: %s (%3d/200 iterations)" % (n, model.reconstruction_err_,  model.n_iter_))
+		"""
 		o_sparseH = cal_sparseness(H)
 		o_sparseW = cal_sparseness(W)
 		o_rss_mse = cal_rss_mse(W,H,V)
 		o_rss = o_rss_mse[0]
 		o_mse = o_rss_mse[1]
 		o_evar = cal_evar(o_rss, V)
+		"""
 		o_fsW = cal_featureScore_kim(W)
 		o_predH = predict_H(H)
+		"""
 		out = [rank, n, o_sparseH, o_sparseW, o_rss, o_mse, o_evar]
 		np.savetxt('.'.join([prefix, "sta.txt"]), out)
+		"""
 		np.savetxt('.'.join([prefix, "featureScore_W.txt"]), o_fsW)
 		np.savetxt('.'.join([prefix, "predict_H.txt"]), o_predH)
 		saveH(prefix, H)
@@ -337,6 +340,7 @@ def run_nmf(V, rank, n, prefix):
 			H = model.components_
 			print("%2d/%d : reconstruction err: %s (%3d/200 iterations)" % (i + 1, n, model.reconstruction_err_,  model.n_iter_))
 			consensus += cal_connectivity(H, predict_H(H)[0])
+			"""
 			o_sparseH = cal_sparseness(H)
 			o_sparseW = cal_sparseness(W)
 			o_rss_mse = cal_rss_mse(W,H,V)
@@ -345,17 +349,20 @@ def run_nmf(V, rank, n, prefix):
 			o_evar = cal_evar(o_rss, V)
 			out = [i+1, rank, n, o_sparseH, o_sparseW, o_rss, o_mse, o_evar]
 			out_list.append(out)
+			"""
 		consensus /= n
 		p_consensus = reorder(consensus)
 		plot(prefix, p_consensus, rank)
 		saveC(prefix, p_consensus)
-		"""o_cophcor = cal_cophenetic(consensus)"""
-		"""o_disp = cal_dispersion(consensus)"""
+		"""
+		o_cophcor = cal_cophenetic(consensus)
+		o_disp = cal_dispersion(consensus)
 		np.savetxt('.'.join([prefix, "sta.mx"]), out_list, delimiter="\t")
 		out2 = list(np.mean(np.squeeze(out_list)[:,1:], axis=0))
-		"""out2.append(o_cophcor)"""
-		"""out2.append(o_disp)"""
+		out2.append(o_cophcor)
+		out2.append(o_disp)
 		np.savetxt('.'.join([prefix, "sta.txt"]), out2)
+		"""
 		print("perform NMF in nndsvd model")
 		model = NMF(n_components=rank, init='nndsvd', random_state=0, verbose=True)
 		W = model.fit_transform(V)
