@@ -164,6 +164,42 @@ python snATAC.nmf.bam.py --bam tmp.repl1_CEMBA171212_4B.sorted.bam \
 ```
 
 
+#### 5. determine which rank to choose
+
+when you got cluster results for each rank (the # of clusters), use sparseness (in *.statH file) to determine which rank should choose.
+you can calculate the median sparseness from column "sparseness" in *.statH file for each rank.
+
+#### 6. draw Sankey Diagram
+
+when you have cluster results for each rank, you can plot Sankey Diagram to see where cell goes for one rank to another.
+Also, you can tell at which rank is the robust cluster result.
+
+you need to create two files by using the information in column "class0" in *.statH file. 
+I create them in directory example/
+1. CEMBA171212_4B.statH.sankey.summary
+2. CEMBA171212_4B.statH.sankey.idx
+
+```bash
+python sklearn.nmf.sankey.py -h
+usage: sklearn.nmf.sankey.py [-h] [--data DATA] [--idx IDX] [-o OUTPREFIX]
+
+plot sankey diagram
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --data DATA           summary of links for sankey diagram
+  --idx IDX             index for each elemnets
+  -o OUTPREFIX, --outPrefix OUTPREFIX
+                        output prefix
+```
+
+example:
+
+```bash
+python sklearn.nmf.sankey.py --data example/CEMBA171212_4B.statH.sankey.summary
+			--idx example/CEMBA171212_4B.statH.sankey.idx
+			-o example/CEMBA171212_4B.statH
+```
 
 
 
