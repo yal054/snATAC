@@ -11,7 +11,7 @@ you will need "Sorted bam file", "Full sparse matrix", "Nuclei ID coordinate", "
 
 #### 1. run NMF on tf-idf normlization sparse matrix, plot normalized matrix H & W
 
-sklearn.nmf.py
+sklearn.nmf.lite.py
 ```bash
 python sklearn.nmf.py -h
 usage: sklearn.nmf.py [-h] [-i INPUTF] [-x XGI] [-y YGI] [-r RANK] [-n N_RUN]
@@ -50,11 +50,11 @@ optional arguments:
 example:
 ```bash
 # run NMF
-python sklearn.nmf.py -i tmp.repl1_CEMBA171212_4B.sparse.npz \
+python sklearn.nmf.lite.py -i tmp.repl1_CEMBA171212_4B.sparse.npz \
 			-x tmp.repl1_CEMBA171212_4B.xgi \
 			-y tmp.repl1_CEMBA171212_4B.ygi \
 			-o example \
-			-r 15 -n 30 -p 0.05 -c 1000 > example.log
+			-r 15 -n 1 -p 0.05 -c 1000 > example.log
 
 # draw heatmap
 Rscript sklearn.plotH.R -i example.H.mx -o example.H
