@@ -11,10 +11,10 @@ you will need "Sorted bam file", "Full sparse matrix", "Nuclei ID coordinate", "
 
 #### 1. run NMF on tf-idf normlization sparse matrix, plot normalized matrix H & W
 
-sklearn.nmf.lite.py
+snATAC.nmf.lite.py
 ```bash
-python sklearn.nmf.py -h
-usage: sklearn.nmf.py [-h] [-i INPUTF] [-x XGI] [-y YGI] [-r RANK] [-n N_RUN]
+python snATAC.nmf.py -h
+usage: snATAC.nmf.py [-h] [-i INPUTF] [-x XGI] [-y YGI] [-r RANK] [-n N_RUN]
                       [-p PROB] [-c CT] [-o OUTPREFIX]
 
 Run NMF using sklearn.
@@ -34,10 +34,10 @@ optional arguments:
                         output prefix
 ```
 
-sklearn.plotH.R
+snATAC.plotH.R
 ```bash
-Rscript sklearn.plotH.R -h
-usage: sklearn.plotH.R [-h] -i INPUT -o OUTPUT
+Rscript snATAC.plotH.R -h
+usage: snATAC.plotH.R [-h] -i INPUT -o OUTPUT
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -50,23 +50,23 @@ optional arguments:
 example:
 ```bash
 # run NMF
-python sklearn.nmf.lite.py -i tmp.repl1_CEMBA171212_4B.sparse.npz \
+python snATAC.nmf.lite.py -i tmp.repl1_CEMBA171212_4B.sparse.npz \
 			-x tmp.repl1_CEMBA171212_4B.xgi \
 			-y tmp.repl1_CEMBA171212_4B.ygi \
 			-o example \
 			-r 15 -n 1 -p 0.05 -c 1000 > example.log
 
 # draw heatmap
-Rscript sklearn.plotH.R -i example.H.mx -o example.H
-Rscript sklearn.plotW.R -i example.W.mx -o example.W
+Rscript snATAC.plotH.R -i example.H.mx -o example.H
+Rscript snATAC.plotW.R -i example.W.mx -o example.W
 ```
 
 #### 2. calculate measurements and output matrix, coorfinates for each cell cluster
 
-sklearn.nmf.stat.py
+snATAC.nmf.stat.py
 ```bash
-python sklearn.nmf.stat.py -h
-usage: sklearn.nmf.stat.py [-h] [-m MATRIX] [-x XGI] [-y YGI] [--basis BASIS]
+python snATAC.nmf.stat.py -h
+usage: snATAC.nmf.stat.py [-h] [-m MATRIX] [-x XGI] [-y YGI] [--basis BASIS]
                            [--coef COEF] [-c CONTRIBUTE] [-o OUTPREFIX]
 
 Run statistic for NMF using sklearn.
@@ -87,8 +87,8 @@ optional arguments:
 
 calculate cell sparseness and entropy using the statH file
 ```bash
-Rscript sklearn.statBox.R -h
-usage: sklearn.statBox.R [-h] -i INPUT -o OUTPUT
+Rscript snATAC.statBox.R -h
+usage: snATAC.statBox.R [-h] -i INPUT -o OUTPUT
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -100,7 +100,7 @@ optional arguments:
 
 example:
 ```
-python sklearn.nmf.stat.py -m example.npz \
+python snATAC.nmf.stat.py -m example.npz \
 			-x example.xgi \
 			-y example.ygi \
 			--basis example.W.mx -\
@@ -108,16 +108,16 @@ python sklearn.nmf.stat.py -m example.npz \
 			-c 0.2 -o example
 
 # calculate cell sparseness and entropy using the statH file
-Rscript sklearn.statBox.R -i example.statH \
+Rscript snATAC.statBox.R -i example.statH \
 			-o example >> example.sta.txt
 ```
 
 #### 3. calculate silhouette and plot tSNE using coefficient matrix H
 
-sklearn.nmf.plot.py
+snATAC.nmf.plot.py
 ```bash
-python sklearn.nmf.plot.py -h
-usage: sklearn.nmf.plot.py [-h] [--normH NORMH] [--statH STATH]
+python snATAC.nmf.plot.py -h
+usage: snATAC.nmf.plot.py [-h] [--normH NORMH] [--statH STATH]
                            [-p PERPLEXITY] [-o OUTPREFIX]
 
 Run NMF using sklearn.
@@ -134,7 +134,7 @@ optional arguments:
 
 example:
 ```bash
-python sklearn.nmf.plot.py --normH example.normH \
+python snATAC.nmf.plot.py --normH example.normH \
 			--statH example.statH \
 			-p 30 -o example
 ```
@@ -142,10 +142,10 @@ python sklearn.nmf.plot.py --normH example.normH \
 
 #### 4. extract reads barcode from bam file and generate aggregate bam files for each cell cluster
 
-sklearn.nmf.bam.py
+snATAC.nmf.bam.py
 ```bash
-python sklearn.nmf.bam.py -h
-usage: sklearn.nmf.bam.py [-h] [--bam BAM] [--statH STATH] [-o OUTPREFIX]
+python snATAC.nmf.bam.py -h
+usage: snATAC.nmf.bam.py [-h] [--bam BAM] [--statH STATH] [-o OUTPREFIX]
 
 filter bam based on QNAMES
 
@@ -159,7 +159,7 @@ optional arguments:
 
 example:
 ```bash
-python sklearn.nmf.bam.py --bam tmp.repl1_CEMBA171212_4B.sorted.bam \
+python snATAC.nmf.bam.py --bam tmp.repl1_CEMBA171212_4B.sorted.bam \
 			--statH example.statH -o example
 ```
 
