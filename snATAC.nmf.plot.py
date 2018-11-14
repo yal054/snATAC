@@ -19,6 +19,7 @@ from scipy import io
 
 from sklearn.manifold import TSNE
 from sklearn.metrics import silhouette_samples, silhouette_score, pairwise_distances
+import umap
 
 from time import perf_counter as pc
 
@@ -46,6 +47,11 @@ def run():
 	o_silhouette = cal_silhouette(normH,o_stat_H)
 	X_dist = cal_pairwise_pearson(normH)
 	X_transformed = cal_tSNE(X_dist, perplexity)
+	np.savetxt('.'.join([outPrefix, "tsne.xy"]), X_transformed, fmt= "%g", delimiter="\t")
+	"""
+	X_transformed = cal_umap(X_dist)
+	np.savetxt('.'.join([outPrefix, "umap.xy"]), X_transformed, fmt= "%g", delimiter="\t")
+	"""
 	plot_silhouette_tsne(o_silhouette, X_transformed, o_stat_H, rank, outPrefix)
 	end_time = pc()
 	print('Used (secs): ', end_time - start_time)
@@ -88,6 +94,11 @@ def cal_pairwise_pearson(normH):
 
 def cal_tSNE(X_dist, p):
 	X_transformed = TSNE(n_components=2, perplexity=p, random_state=1, verbose=2, metric="precomputed").fit_transform(X_dist)
+	return X_transformed
+
+def cal_umap(X):
+	embedding = umap.UMAP(n_neighbors=5, min_dist=0.3, metric='correlation')
+	X_transformed = embedding.fit_transform(X)
 	return X_transformed
 
 def plot_silhouette_tsne(o_silhouette, X_transformed, o_stat_H, rank, prefix):
