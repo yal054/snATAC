@@ -1,5 +1,116 @@
 # snATAC
 
+### overall summary
+check cluster results in different ranks, and then choose the robust one
+work on TSCC
+git clone https://github.com/YoungLeeBBS/snATAC
+
+download example files (see step 0) to folder example/
+
+```bash
+## -- 1 -- ##
+# run snATAC in different ranks (# of cell clusters)
+for i in `seq 5 20`;
+do echo $i;
+echo -e "
+#!/bin/bash
+
+#PBS -q home
+#PBS -N rank${i}
+#PBS -l nodes=1:ppn=2,pmem=8gb,walltime=1:00:00
+#PBS -V
+#PBS -M xxx@gmail.com
+#PBS -m abe
+#PBS -A ren-group
+#PBS -j oe
+
+module load R
+
+path0=/projects/ps-renlab/yangli/projects/CEMBA
+n=1
+p=`bc <<< ${i}*2`
+prefix=example.r${i}.n\${n}
+
+mkdir example/\$prefix/
+python snATAC.nmf.lite.py -i example/tmp.repl1_CEMBA171212_4B.sparse.npz -x example/tmp.repl1_CEMBA171212_4B.xgi -y example/tmp.repl1_CEMBA171212_4B.ygi -o example/\$prefix/\$prefix -r ${i} -n \${n} -p 0.05 -c 1000 > example/\$prefix/\$prefix.log
+Rscript snATAC.plotH.R -i example/\$prefix/\$prefix.H.mx -o example/\$prefix/\$prefix.H
+Rscript snATAC.plotW.R -i example/\$prefix/\$prefix.W.mx -o example/\$prefix/\$prefix.W
+python snATAC.nmf.stat.py -m example/\$prefix/\$prefix.npz -x example/\$prefix/\$prefix.xgi -y example/\$prefix/\$prefix.ygi --basis example/\$prefix/\$prefix.W.mx --coef example/\$prefix/\$prefix.H.mx -c 0.2 -o example/\$prefix/\$prefix
+python snATAC.nmf.plot.py --normH example/\$prefix/\$prefix.normH --statH example/\$prefix/\$prefix.statH -p \${p} -o example/\$prefix/\$prefix
+" | sed '1d' > qsub/snATAC.nmf.r${i}.qsub
+qsub qsub/snATAC.nmf.r${i}.qsub -o log/snATAC.nmf.r${i}.log -e log/snATAC.nmf.r${i}.err
+done;
+
+## -- 2 -- ##
+# after all the job finished, plot measurment (sparseness)
+for i in cellSparse entropy; do echo $i >> example/sta.lite.header; done
+cut -f 1 example/example.r5.n1/example.r5.n1.box.sta | sed "1 s/contributes/rank/g" > example/sta.box.lite.header
+
+for i in `seq 5 20`;
+do echo $i;
+n=1
+prefix=example.r${i}.n\${n}
+
+# calculate cell sparseness and entropy using the statH file
+Rscript snATAC.statBox.R -i example/$prefix/$prefix.statH -o example/$prefix/$prefix >> example/$prefix/$prefix.sta.txt
+cat example/$prefix/$prefix.sta.txt | sed -e "s/^/example\t${i}\t/g" | paste - example/sta.lite.header > example/$prefix/$prefix.sta.tmp
+sed '1d' example/$prefix/$prefix.box.sta | cut -f 2 | sed -e "1i ${i}" > example/$prefix/$prefix.box.contributes
+sed '1d' example/$prefix/$prefix.box.sta | cut -f 3 | sed -e "1i ${i}" > example/$prefix/$prefix.box.sparseness
+sed '1d' example/$prefix/$prefix.box.sta | cut -f 4 | sed -e "1i ${i}" > example/$prefix/$prefix.box.entropy
+sed '1d' example/$prefix/$prefix.statH | sed -e "s/^/${s}\t${i}\t/g" > example/$prefix/$prefix.statH.tmp
+done;
+cat example/*/*.sta.tmp | sed -e "1i samples\tranks\tval\tstat" | awk 'BEGIN{FS=OFS="\t"}{print $1,$2,$4,$3}' > example/example.sta.txt
+rm -rf $path0/01.nmf/${s}/*/*.sta.tmp
+paste example/sta.box.lite.header example/*/*.box.contributes > example/example.contributes.sta.txt
+paste example/sta.box.lite.header example/*/*.box.sparseness > example/example.sparseness.sta.txt
+paste example/sta.box.lite.header example/*/*.box.entropy > example/example.entropy.sta.txt
+rm -rf example/*/*.box.contributes example/*/*.box.sparseness example/*/*.box.entropy
+cat example/*/*.statH.tmp | sed -e "1i samples\tranks\txgi\tindex\tclass0\tclass1\tcontributes\tsparseness\tentropy" > example/example.statH.sta.txt
+rm -rf example/*/*.statH.tmp
+Rscript snATAC.plotBox.R -i example/example.statH.sta.txt -o example/example.statH.sta
+done;
+
+## -- 3 -- ##
+# plot Sankey diagram
+for i in `seq 5 20`;
+do echo $i;
+n=1
+prefix=example.r${i}.n\${n}
+awk -v a=${i} 'BEGIN{FS=OFS="\t"}{print "r"a".c"$4*1}' example/$prefix/$prefix.statH > example/$prefix/$prefix.statH.tmp
+done;
+
+for j in `seq 5 19`;
+do echo $j;
+j1=`bc <<< ${j}+1`
+echo ${j1}
+prefix1=example.r${j}.n\${n}
+prefix2=example.r${j1}.n\${n}
+paste example/$prefix1/$prefix1.statH.tmp example/$prefix2/$prefix2.statH.tmp | sort | uniq -c | awk 'BEGIN{OFS="\t"}{print $2,$3,$1}' >> example/example.statH.sankey.summary
+done;
+rm -rf example/*/*.statH.tmp
+sed -i -e "1i from\tto\tcount" example/example.statH.sankey.summary
+done;
+
+n=0
+for i in `seq 3 20`;
+do echo $i;
+c=`bc <<< ${i}-1`
+for j in `seq 0 ${c}`;
+do echo $j;
+echo -e "$n\tr${i}.c${j}\t${i}" >> example/example.statH.sankey.idx
+n=`bc <<< ${n}+1`
+done;
+done;
+sed -i -e "1i idx\tname\tcolor" example/example.statH.sankey.idx
+
+python snATAC.nmf.sankey.py --data example/example.statH.sankey.summary  --idx example/example.statH.sankey.idx -o example/example.statH
+
+## -- 4 -- ##
+# extract read for each cell cluster and gerenate aggregate *.bam file
+# for example choose rank = 15 after check the measurement box-plot and sankey plot 
+python snATAC.nmf.bam.py --bam example/tmp.repl1_CEMBA171212_4B.sorted.bam --statH example/example.r15.n1/example.r15.n1.statH -o example/example.r15.n1/example.r15.n1
+```
+
 #### 0. download datasets
 
 access to snATAC Cool ADMIN: http://epigenomics.sdsc.edu:8086/
