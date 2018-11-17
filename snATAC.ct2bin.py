@@ -28,7 +28,7 @@ def is_sorted_queryname(header):
                 return True
     return False
 
-def bins_maker(genomeSize):
+def bins_maker(genomeSize, bin_size):
     genomeSizes = pybedtools.BedTool(genomeSize)
     bins = genomeSizes.window_maker(g=genomeSize, w=bin_size)
     bin_dict = {}
@@ -36,7 +36,7 @@ def bins_maker(genomeSize):
     for i in bins:
         chr = i.chrom
         start = i.start
-        end = i.start
+        end = i.end
         key = (chr+"\t"+str(start)+"\t"+str(end))
         bin_dict[key] = idx
         idx += 1
@@ -56,7 +56,7 @@ def main():
     outf = args.output
     
     # start reading the bam
-    samfile = pysam.AlignmentFile(input_bam, "rb")
+    samfile = pysam.AlignmentFile(bamf, "rb")
     # check if bam file is sorted by name or not
     if not is_sorted_queryname(samfile.header):
         sys.exit("Error: bam needs to be sorted by read name")
@@ -64,7 +64,7 @@ def main():
     # get chormosome size from header 
     headerSQ = samfile.header["SQ"]
     genSizes = get_genSize(headerSQ)
-    bins_dict = bins_maker(genomeSize)
+    bins_dict = bins_maker(genomeSize, bin_size)
     idx = 0 
     counts = {}
     barcodes = {}
@@ -77,7 +77,7 @@ def main():
         except: # to the end
             break
         if read1.is_proper_pair:
-	    if read1.is_read1:
+            if read1.is_read1:
                 pass
             else:
                 tmp = copy.deepcopy(read1)
@@ -112,7 +112,7 @@ def main():
             if(ref1 == ref2 and abs(read1.reference_start//bin_size - read1.next_reference_start//bin_size) > 1):
                 midpos = pos + length * 0.5
                 if (midpos//bin_size + 1) * bin_size < chrSize1:
-                   key = (ref1+"\t"+str((midpos//bin_size) * bin_size)+"\t"+str((midpos//bin_size + 1) * bin_size)+"\t"+barcode)
+                    key = (ref1+"\t"+str((midpos//bin_size) * bin_size)+"\t"+str((midpos//bin_size + 1) * bin_size)+"\t"+barcode)
                     if key in counts:
                         counts[key] += 1
                     else:
@@ -125,18 +125,29 @@ def main():
                         counts[key] = 1
 
     samfile.close()
-    outmat = ".".join(outf,"mat")
-    outxgi = ".".join(outf,"xgi")
-    np.savetxt(outxgi, barcodes)
-    for key,val in counts.items():
-        items = key.strip().split("\t")
-        xgi = items[3]
-        ygi = items[0]+"\t"+items[1]+"\t"+items[2]
-        xgi_idx = barcode[xgi]
-        ygi_idx = bins_dict[ygi]
-        outmat.write(str(xgi_idx) + "\t" + str(ygi_idx) + "\t" + str(val) + "\n")
+    outmat = ".".join([outf,"mat"])
+    outxgi = ".".join([outf,"xgi"])
+    outygi = ".".join([outf,"ygi"])
+    with open(outxgi, 'w') as outxgi:
+        for key, val in barcodes.items():
+            outxgi.write(key + "\n")
+    outxgi.close()
+
+    with open(outygi, 'w') as outygi:
+        for key, val in bins_dict.items():
+            outygi.write(key + "\n")
+    outygi.close()
+
+    with open(outmat, 'w') as outmat:
+        for key,val in counts.items():
+            items = key.strip().split("\t")
+            xgi = items[3]
+            ygi = items[0]+"\t"+items[1]+"\t"+items[2]
+            xgi_idx = barcodes[xgi]
+            ygi_idx = bins_dict[ygi]
+            outmat.write(str(xgi_idx) + "\t" + str(ygi_idx) + "\t" + str(val) + "\n")
     outmat.close()
- 
+
 if __name__ == "__main__":
     main()
 
