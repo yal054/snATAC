@@ -3,7 +3,9 @@
 ### overall summary
 check cluster results in different ranks, and then choose the robust one
 work on TSCC
+```bash
 git clone https://github.com/YoungLeeBBS/snATAC
+```
 
 download example files (see step 0) to folder example/
 
