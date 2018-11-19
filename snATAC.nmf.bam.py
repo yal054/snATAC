@@ -48,9 +48,8 @@ def generate_bam_worker(bamf, o_stat_H, r, prefix):
 			obam.write(b)
 	obam.close()
 	bamF.close()
-  print("metaCell =", n, " witting finished.")
+	print("metaCell =", n, " witting finished.")
 
- 
 
 if __name__ == "__main__":
 	"""filter bam based on QNAMES"""
