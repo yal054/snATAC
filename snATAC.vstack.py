@@ -3,7 +3,7 @@
 import argparse
 
 parser = argparse.ArgumentParser(description='stack multiple npz matrix')
-parser.add_argument('-i', dest='input', nargs='+', help='input npz files')
+parser.add_argument('-i', dest='input', nargs='*', help='input npz files')
 parser.add_argument('-o', type=str, dest="output", help='output prefix')
 
 args = parser.parse_args()
@@ -22,8 +22,10 @@ def main():
 	start_time = pc()
 	npz_list = []
 	for i in input_lists:
+		print(i)
 		npz = load_npz(i)
 		npz_list.append(npz)
+		del(npz)
 	merged_npz = vstack(npz_list)
 	outnpz = ".".join([outf,"npz"])
 	save_npz(outnpz, merged_npz)
