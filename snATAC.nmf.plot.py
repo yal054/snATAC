@@ -46,12 +46,13 @@ def run():
 	print("draw silhouette & tsne plot")
 	o_silhouette = cal_silhouette(normH,o_stat_H)
 	X_dist = cal_pairwise_pearson(normH)
+	"""
 	X_transformed = cal_tSNE(X_dist, perplexity)
 	np.savetxt('.'.join([outPrefix, "tsne.xy"]), X_transformed, fmt= "%g", delimiter="\t")
 	"""
 	X_transformed = cal_umap(X_dist)
 	np.savetxt('.'.join([outPrefix, "umap.xy"]), X_transformed, fmt= "%g", delimiter="\t")
-	"""
+	
 	plot_silhouette_tsne(o_silhouette, X_transformed, o_stat_H, rank, outPrefix)
 	end_time = pc()
 	print('Used (secs): ', end_time - start_time)
@@ -97,7 +98,8 @@ def cal_tSNE(X_dist, p):
 	return X_transformed
 
 def cal_umap(X):
-	embedding = umap.UMAP(n_neighbors=5, min_dist=0.3, metric='correlation')
+	embedding = umap.UMAP(metric='correlation')
+	#embedding = umap.UMAP(n_neighbors=p, min_dist=0.1, metric='correlation')
 	X_transformed = embedding.fit_transform(X)
 	return X_transformed
 
@@ -159,7 +161,8 @@ def plot_silhouette_tsne(o_silhouette, X_transformed, o_stat_H, rank, prefix):
 	ax2.set_ylabel("Feature space for the 2nd tsne")
 	plt.suptitle(("Silhouette analysis for tSNE clustering on coefficient matrix H "
 		"with n_clusters = %d" % n_clusters),fontsize=14, fontweight='bold')
-	fig.savefig('.'.join([prefix, "silhouette_tsne", "png"]))
+	#fig.savefig('.'.join([prefix, "silhouette_tsne", "png"]))
+	fig.savefig('.'.join([prefix, "silhouette_umap", "png"]))
 
 
 if __name__ == "__main__":
