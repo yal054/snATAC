@@ -72,13 +72,16 @@ def main():
     counts = {}
     barcodes = {}
     barcode_tmp = "AAA"
-
+    n_lines = 0
     while True:
         try:
             read1 = next(samfile)
             read2 = next(samfile)
         except: # to the end
             break
+        n_lines += 1
+        if n_lines% 1000000 == 0 :
+          print( "%s read pairs processed."%n_lines)
         if read1.is_proper_pair:
             if read1.is_read1:
                 pass

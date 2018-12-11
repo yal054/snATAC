@@ -1,0 +1,11 @@
+matplotlib
+fastcluster
+pysam
+numpy
+scipy
+umap
+plotly
+sklearn
+pybedtools
+multiprocessing
+pandas
