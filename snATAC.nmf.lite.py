@@ -127,7 +127,7 @@ def filter_V(V, xgi, ygi, prob, ct):
 
 	rowSum = np.sum(newV,axis=1)
 	rowQ = mquantiles(np.array(rowSum), prob=prob)
-	row_tokeep = ravel(rowSum >= rowQ)
+	row_tokeep = ravel(rowSum > rowQ)
 	newV = newV[row_tokeep, :]
 	selt_xgi = list(compress(xgi, col_tokeep))
 	selt_ygi = list(compress(ygi, row_tokeep))
