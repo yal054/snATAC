@@ -308,7 +308,7 @@ def run_nmf(V, rank, n, prefix):
 	"""
 	if n == 1:
 		print("=== run NMF at rank %d  ===" % rank)
-		model = NMF(n_components=rank, init='nndsvd', random_state=0, verbose=True)
+		model = NMF(n_components=rank, init='nndsvd', alpha=0, random_state=0, verbose=True)
 		W = model.fit_transform(V)
 		H = model.components_
 		print("1/%d : reconstruction err: %s (%3d/200 iterations)" % (n, model.reconstruction_err_,  model.n_iter_))
@@ -335,7 +335,7 @@ def run_nmf(V, rank, n, prefix):
 		out_list = []
 		consensus = np.zeros((V.shape[1], V.shape[1]))
 		for i in range(n):
-			model = NMF(n_components=rank, init='nndsvd', random_state=i, verbose=True)
+			model = NMF(n_components=rank, init='nndsvd', alpha=0, random_state=i, verbose=True)
 			W = model.fit_transform(V)
 			H = model.components_
 			print("%2d/%d : reconstruction err: %s (%3d/200 iterations)" % (i + 1, n, model.reconstruction_err_,  model.n_iter_))
