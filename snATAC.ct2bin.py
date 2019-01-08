@@ -157,7 +157,7 @@ def main():
         ct = []
         for key,val in counts.items():
             items = key.strip().split("\t")
-            xgi_key = items[6]
+            xgi_key = items[3]
             ygi_key = items[0]+"\t"+items[1]+"\t"+items[2]
             xgi_idx = barcodes[xgi_key]
             ygi_idx = bins_dict[ygi_key]
