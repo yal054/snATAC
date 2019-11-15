@@ -51,7 +51,7 @@ cut -f 1 example/example.r5.n1/example.r5.n1.box.sta | sed "1 s/contributes/rank
 for i in `seq 5 20`;
 do echo $i;
 n=1
-prefix=example.r${i}.n\${n}
+prefix=example.r${i}.n{n}
 
 # calculate cell sparseness and entropy using the statH file
 Rscript snATAC.statBox.R -i example/$prefix/$prefix.statH -o example/$prefix/$prefix >> example/$prefix/$prefix.sta.txt
@@ -77,7 +77,7 @@ done;
 for i in `seq 5 20`;
 do echo $i;
 n=1
-prefix=example.r${i}.n\${n}
+prefix=example.r${i}.n{n}
 awk -v a=${i} 'BEGIN{FS=OFS="\t"}{print "r"a".c"$4*1}' example/$prefix/$prefix.statH > example/$prefix/$prefix.statH.tmp
 done;
 
@@ -85,8 +85,8 @@ for j in `seq 5 19`;
 do echo $j;
 j1=`bc <<< ${j}+1`
 echo ${j1}
-prefix1=example.r${j}.n\${n}
-prefix2=example.r${j1}.n\${n}
+prefix1=example.r${j}.n{n}
+prefix2=example.r${j1}.n{n}
 paste example/$prefix1/$prefix1.statH.tmp example/$prefix2/$prefix2.statH.tmp | sort | uniq -c | awk 'BEGIN{OFS="\t"}{print $2,$3,$1}' >> example/example.statH.sankey.summary
 done;
 rm -rf example/*/*.statH.tmp

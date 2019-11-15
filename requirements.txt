@@ -1,3 +1,4 @@
+#python3
 matplotlib
 fastcluster
 pysam
@@ -9,3 +10,4 @@ sklearn
 pybedtools
 multiprocessing
 pandas
+colorlover
